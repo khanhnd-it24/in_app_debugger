@@ -2,8 +2,10 @@ package bootstrap
 
 import (
 	"backend/src/common/configs"
+	"backend/src/common/log"
 	"backend/src/infra/repo"
 	"context"
+	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/fx"
@@ -14,6 +16,7 @@ import (
 func BuildStorageModules() fx.Option {
 	return fx.Options(
 		fx.Provide(newMongoDB),
+		fx.Provide(newCacheRedis),
 
 		fx.Provide(repo.NewDeviceRepo),
 		fx.Provide(repo.NewNetworkRepo),
@@ -43,4 +46,30 @@ func newMongoDB(lc fx.Lifecycle, logger *zap.SugaredLogger) *mongo.Database {
 		},
 	})
 	return db
+}
+
+func newCacheRedis() redis.UniversalClient {
+	cf := configs.Get().Redis
+	hosts := cf.Hosts
+	var client redis.UniversalClient
+	isClusterMode := len(hosts) > 1
+	if isClusterMode {
+		client = redis.NewClusterClient(&redis.ClusterOptions{
+			Addrs:    hosts,
+			Username: cf.Username,
+			Password: cf.Password,
+		})
+	} else {
+		client = redis.NewClient(&redis.Options{
+			Addr:     hosts[0],
+			Username: cf.Username,
+			Password: cf.Password,
+		})
+	}
+
+	err := client.Ping(context.Background()).Err()
+	if err != nil {
+		log.GetLogger().GetZap().Fatalf("ping redis error, err:[%s]", err.Error())
+	}
+	return client
 }

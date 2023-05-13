@@ -28,13 +28,13 @@ func (i *DeviceController) UpdateDevice(c *gin.Context) {
 		return
 	}
 
-	device, ierr := i.deviceService.UpsertDeviceUC(c, req)
+	res, ierr := i.deviceService.UpdateDeviceUC(c, req)
 	if ierr != nil {
 		i.ErrorData(c, ierr)
 		return
 	}
 
-	i.Success(c, device)
+	i.Success(c, res)
 }
 
 func (i *DeviceController) GetDevice(c *gin.Context) {
@@ -48,6 +48,15 @@ func (i *DeviceController) GetDevice(c *gin.Context) {
 }
 
 func (i *DeviceController) GetAllDevices(c *gin.Context) {
+	devices, ierr := i.deviceService.GetAllDevices(c)
+	if ierr != nil {
+		i.ErrorData(c, ierr)
+		return
+	}
+	i.Success(c, devices)
+}
+
+func (i *DeviceController) UpdateOnlineDevice(c *gin.Context) {
 	devices, ierr := i.deviceService.GetAllDevices(c)
 	if ierr != nil {
 		i.ErrorData(c, ierr)

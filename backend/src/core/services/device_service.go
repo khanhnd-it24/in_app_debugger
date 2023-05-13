@@ -5,6 +5,7 @@ import (
 	"backend/src/common/log"
 	"backend/src/core/domains"
 	"backend/src/present/http/requests"
+	"backend/src/present/http/responses"
 	"context"
 )
 
@@ -20,17 +21,26 @@ func NewDeviceService(
 	}
 }
 
-func (d *DeviceService) UpsertDeviceUC(ctx context.Context, req *requests.Device) (*domains.Device, *common.Error) {
-	device := domains.NewDevice()
-	device.SetDeviceId(req.DeviceId).SetDeviceName(req.DeviceName)
+func (d *DeviceService) UpdateDeviceUC(ctx context.Context, req *requests.Device) (*responses.UpdateDeviceSuccess, *common.Error) {
+	device := domains.NewDevice(req.DeviceId, req.DeviceName)
 
-	device, err := d.deviceRepo.Upsert(ctx, device)
+	if req.IsOnline {
+		_, err := d.deviceRepo.SaveOnlineDevice(ctx, device)
+		if err != nil {
+			log.IErr(ctx, err)
+			return nil, err
+		}
+
+		return &responses.UpdateDeviceSuccess{Success: true}, nil
+	}
+
+	err := d.deviceRepo.RemoveOnlineDevice(ctx, device.DeviceId)
 	if err != nil {
 		log.IErr(ctx, err)
 		return nil, err
 	}
 
-	return device, nil
+	return &responses.UpdateDeviceSuccess{Success: true}, nil
 }
 
 func (d *DeviceService) GetDeviceByDeviceId(ctx context.Context, deviceId string) (*domains.Device, *common.Error) {

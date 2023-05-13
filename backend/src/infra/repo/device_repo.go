@@ -4,63 +4,77 @@ import (
 	"backend/src/common"
 	"backend/src/core/domains"
 	"context"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"google.golang.org/appengine/log"
+	"fmt"
+	"github.com/go-redis/redis/v8"
+	"time"
 )
 
-func NewDeviceRepo(db *mongo.Database) domains.DeviceRepo {
+const (
+	onlineDeviceFormat = "online.%s"
+	onlinePrefix       = "online.*"
+)
+
+func NewDeviceRepo(cache redis.UniversalClient) domains.DeviceRepo {
 	return &DeviceRepo{
-		collection: db.Collection(new(domains.Device).CollectionName()),
+		cache: cache,
 	}
 }
 
 type DeviceRepo struct {
-	collection *mongo.Collection
+	cache redis.UniversalClient
 }
 
-func (d DeviceRepo) Upsert(ctx context.Context, device *domains.Device) (*domains.Device, *common.Error) {
-	filter := bson.D{{Key: "device_id", Value: device.DeviceId}}
-	update := bson.D{{Key: "$set", Value: device}}
-	opts := options.Update().SetUpsert(true)
-	_, err := d.collection.UpdateOne(ctx, filter, update, opts)
-	if err != nil {
+func (d DeviceRepo) SaveOnlineDevice(ctx context.Context, device *domains.Device) (*domains.Device, *common.Error) {
+	onlineDevice := fmt.Sprintf(onlineDeviceFormat, device.DeviceId)
+	if err := d.cache.Set(ctx, onlineDevice, device.DeviceName, 60*time.Hour).Err(); err != nil {
 		return nil, common.ErrSystemError(ctx, err.Error())
 	}
-
 	return device, nil
 }
 
+func (d DeviceRepo) RemoveOnlineDevice(ctx context.Context, deviceId string) *common.Error {
+	onlineDevice := fmt.Sprintf(onlineDeviceFormat, deviceId)
+
+	isExist := d.cache.Exists(ctx, onlineDevice)
+	if isExist.Val() == 0 {
+		return nil
+	}
+
+	if err := d.cache.Del(ctx, onlineDevice).Err(); err != nil {
+		return common.ErrSystemError(ctx, err.Error())
+	}
+	return nil
+}
+
 func (d DeviceRepo) GetDeviceByDeviceId(ctx context.Context, deviceId string) (*domains.Device, *common.Error) {
-	invoice := new(domains.Device)
-	filter := bson.D{{Key: "device_id", Value: deviceId}}
-	err := d.collection.FindOne(ctx, filter).Decode(&invoice)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, common.ErrNotFound(ctx, "device", "not found")
-		}
+	device := new(domains.Device)
+	device.SetDeviceId(deviceId)
+	onlineDevice := fmt.Sprintf(onlineDeviceFormat, deviceId)
+	if err := d.cache.Get(ctx, onlineDevice).Scan(&device.DeviceName); err != nil {
 		return nil, common.ErrSystemError(ctx, err.Error())
 	}
-	return invoice, nil
+	return device, nil
 }
 
 func (d DeviceRepo) GetAllDevices(ctx context.Context) ([]*domains.Device, *common.Error) {
-	devices := make([]*domains.Device, 0)
-	filter := bson.D{{}}
-	cursor, err := d.collection.Find(ctx, filter)
-	if err != nil {
+	onlineDevices := make([]*domains.Device, 0)
+	iter := d.cache.Scan(ctx, 0, onlinePrefix, 0).Iterator()
+	for iter.Next(ctx) {
+		var deviceId string
+		_, err := fmt.Sscanf(iter.Val(), onlineDeviceFormat, &deviceId)
+		if err != nil {
+			continue
+		}
+
+		device, ierr := d.GetDeviceByDeviceId(ctx, deviceId)
+		if ierr != nil {
+			continue
+		}
+
+		onlineDevices = append(onlineDevices, device)
+	}
+	if err := iter.Err(); err != nil {
 		return nil, common.ErrSystemError(ctx, err.Error())
 	}
-
-	for cursor.Next(ctx) {
-		var device *domains.Device
-		err = cursor.Decode(&device)
-		if err != nil {
-			log.Errorf(ctx, "Cannot decode device %+v", err)
-		} else {
-			devices = append(devices, device)
-		}
-	}
-	return devices, nil
+	return onlineDevices, nil
 }

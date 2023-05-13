@@ -11,6 +11,7 @@ func BuildControllerModule() fx.Option {
 		fx.Provide(controllers.NewBaseController),
 		fx.Provide(controllers.NewDeviceController),
 		fx.Provide(controllers.NewNetworkController),
+		fx.Provide(controllers.NewConsoleController),
 	)
 }
 

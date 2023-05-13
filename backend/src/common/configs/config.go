@@ -19,6 +19,12 @@ type Config struct {
 		Uri string `mapstructure:"uri"`
 		DB  string `mapstructure:"db"`
 	}
+
+	Redis struct {
+		Hosts    []string `mapstructure:"hosts"`
+		Username string   `mapstructure:"username"`
+		Password string   `mapstructure:"password"`
+	} `mapstructure:"redis"`
 }
 
 var common *Config

@@ -10,3 +10,9 @@ server:
 mongo:
   uri: mongodb://root:example@localhost:27017/?readPreference=primary&directConnection=true&ssl=false
   db: in_app_debugger
+
+redis:
+  expire_duration: 600
+  hosts: localhost:6379
+  username: ""
+  password: secret_redis

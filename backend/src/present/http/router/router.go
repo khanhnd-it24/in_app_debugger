@@ -54,6 +54,6 @@ func registerPublicRouters(r *gin.RouterGroup, in RoutersIn) {
 	consoleGroup := r.Group("/consoles")
 	{
 		consoleGroup.GET("/:device_id", in.ConsoleController.GetConsoles)
-		networkGroup.POST("/", in.ConsoleController.CreateConsole)
+		consoleGroup.POST("/", in.ConsoleController.CreateConsole)
 	}
 }

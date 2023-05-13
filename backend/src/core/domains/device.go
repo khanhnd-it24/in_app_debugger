@@ -3,23 +3,17 @@ package domains
 import (
 	"backend/src/common"
 	"context"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"time"
 )
 
 type Device struct {
-	Id         primitive.ObjectID `bson:"_id,omitempty"`
-	DeviceId   string             `bson:"device_id"`
-	DeviceName string             `bson:"device_name"`
-	CreatedAt  time.Time          `bson:"created_at"`
-	UpdatedAt  time.Time          `bson:"updated_at"`
+	DeviceId   string `bson:"device_id"`
+	DeviceName string `bson:"device_name"`
 }
 
-func NewDevice() *Device {
+func NewDevice(deviceId string, deviceName string) *Device {
 	return &Device{
-		Id:        primitive.NewObjectID(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		DeviceId:   deviceId,
+		DeviceName: deviceName,
 	}
 }
 
@@ -34,7 +28,8 @@ func (d *Device) SetDeviceName(deviceName string) *Device {
 }
 
 type DeviceRepo interface {
-	Upsert(ctx context.Context, Device *Device) (*Device, *common.Error)
+	SaveOnlineDevice(ctx context.Context, Device *Device) (*Device, *common.Error)
+	RemoveOnlineDevice(ctx context.Context, deviceId string) *common.Error
 	GetDeviceByDeviceId(ctx context.Context, deviceId string) (*Device, *common.Error)
 	GetAllDevices(ctx context.Context) ([]*Device, *common.Error)
 }
