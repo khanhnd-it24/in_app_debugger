@@ -46,3 +46,12 @@ func (i *DeviceController) GetDevice(c *gin.Context) {
 	}
 	i.Success(c, device)
 }
+
+func (i *DeviceController) GetAllDevices(c *gin.Context) {
+	devices, ierr := i.deviceService.GetAllDevices(c)
+	if ierr != nil {
+		i.ErrorData(c, ierr)
+		return
+	}
+	i.Success(c, devices)
+}

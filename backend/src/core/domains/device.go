@@ -24,7 +24,7 @@ func NewDevice() *Device {
 }
 
 func (d *Device) SetDeviceId(deviceId string) *Device {
-	d.DeviceName = deviceId
+	d.DeviceId = deviceId
 	return d
 }
 
@@ -36,6 +36,7 @@ func (d *Device) SetDeviceName(deviceName string) *Device {
 type DeviceRepo interface {
 	Upsert(ctx context.Context, Device *Device) (*Device, *common.Error)
 	GetDeviceByDeviceId(ctx context.Context, deviceId string) (*Device, *common.Error)
+	GetAllDevices(ctx context.Context) ([]*Device, *common.Error)
 }
 
 func (d *Device) CollectionName() string {

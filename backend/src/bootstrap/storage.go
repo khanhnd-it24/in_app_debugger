@@ -16,6 +16,8 @@ func BuildStorageModules() fx.Option {
 		fx.Provide(newMongoDB),
 
 		fx.Provide(repo.NewDeviceRepo),
+		fx.Provide(repo.NewNetworkRepo),
+		fx.Provide(repo.NewConsoleRepo),
 	)
 }
 

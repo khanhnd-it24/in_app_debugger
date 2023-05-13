@@ -1,0 +1,12 @@
+mode:
+  dev
+
+server:
+  name: In App Debugger
+  http:
+    address: 8000
+    prefix: apis/v1
+
+mongo:
+  uri: mongodb://root:example@localhost:27017/?readPreference=primary&directConnection=true&ssl=false
+  db: in_app_debugger

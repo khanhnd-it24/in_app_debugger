@@ -8,5 +8,7 @@ import (
 func BuildServicesModules() fx.Option {
 	return fx.Options(
 		fx.Provide(services.NewDeviceService),
+		fx.Provide(services.NewConsoleService),
+		fx.Provide(services.NewNetworkService),
 	)
 }

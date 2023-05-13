@@ -12,8 +12,10 @@ import (
 
 type RoutersIn struct {
 	fx.In
-	Engine           *gin.Engine
-	DeviceController controllers.DeviceController
+	Engine            *gin.Engine
+	DeviceController  *controllers.DeviceController
+	NetworkController *controllers.NetworkController
+	ConsoleController *controllers.ConsoleController
 }
 
 func RegisterHandler(engine *gin.Engine) {
@@ -39,6 +41,19 @@ func registerPublicRouters(r *gin.RouterGroup, in RoutersIn) {
 	deviceGroup := r.Group("/devices")
 	{
 		deviceGroup.GET("/:device_id", in.DeviceController.GetDevice)
+		deviceGroup.GET("/", in.DeviceController.GetAllDevices)
 		deviceGroup.PUT("/", in.DeviceController.UpdateDevice)
+	}
+
+	networkGroup := r.Group("/networks")
+	{
+		networkGroup.GET("/:device_id", in.NetworkController.GetNetworks)
+		networkGroup.POST("/", in.NetworkController.CreateNetwork)
+	}
+
+	consoleGroup := r.Group("/consoles")
+	{
+		consoleGroup.GET("/:device_id", in.ConsoleController.GetConsoles)
+		networkGroup.POST("/", in.ConsoleController.CreateConsole)
 	}
 }

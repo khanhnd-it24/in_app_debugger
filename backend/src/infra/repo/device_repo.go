@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"google.golang.org/appengine/log"
 )
 
 func NewDeviceRepo(db *mongo.Database) domains.DeviceRepo {
@@ -42,4 +43,24 @@ func (d DeviceRepo) GetDeviceByDeviceId(ctx context.Context, deviceId string) (*
 		return nil, common.ErrSystemError(ctx, err.Error())
 	}
 	return invoice, nil
+}
+
+func (d DeviceRepo) GetAllDevices(ctx context.Context) ([]*domains.Device, *common.Error) {
+	devices := make([]*domains.Device, 0)
+	filter := bson.D{{}}
+	cursor, err := d.collection.Find(ctx, filter)
+	if err != nil {
+		return nil, common.ErrSystemError(ctx, err.Error())
+	}
+
+	for cursor.Next(ctx) {
+		var device *domains.Device
+		err = cursor.Decode(&device)
+		if err != nil {
+			log.Errorf(ctx, "Cannot decode device %+v", err)
+		} else {
+			devices = append(devices, device)
+		}
+	}
+	return devices, nil
 }

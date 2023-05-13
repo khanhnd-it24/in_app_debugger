@@ -42,3 +42,13 @@ func (d *DeviceService) GetDeviceByDeviceId(ctx context.Context, deviceId string
 
 	return device, nil
 }
+
+func (d *DeviceService) GetAllDevices(ctx context.Context) ([]*domains.Device, *common.Error) {
+	devices, err := d.deviceRepo.GetAllDevices(ctx)
+	if err != nil {
+		log.IErr(ctx, err)
+		return nil, err
+	}
+
+	return devices, nil
+}
