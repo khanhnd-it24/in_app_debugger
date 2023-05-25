@@ -2,18 +2,22 @@ package domains
 
 import (
 	"backend/src/common"
+	"backend/src/common/enums"
 	"context"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
 
 type Network struct {
-	Id        primitive.ObjectID `bson:"_id,omitempty"`
-	DeviceId  string             `bson:"device_id"`
-	Request   string             `bson:"request"`
-	Response  string             `bson:"response"`
-	CreatedAt time.Time          `bson:"created_at"`
-	UpdatedAt time.Time          `bson:"updated_at"`
+	Id         primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	DeviceId   string             `bson:"device_id" json:"deviceId"`
+	Method     enums.HttpMethod   `bson:"method" json:"method"`
+	Path       string             `bson:"path" json:"path"`
+	StatusCode uint               `bson:"status_code" json:"statusCode"`
+	Request    string             `bson:"request" json:"request"`
+	Response   string             `bson:"response" json:"response"`
+	CreatedAt  time.Time          `bson:"created_at" json:"createdAt"`
+	UpdatedAt  time.Time          `bson:"updated_at" json:"updatedAt"`
 }
 
 func NewNetwork() *Network {
@@ -26,6 +30,21 @@ func NewNetwork() *Network {
 
 func (n *Network) SetDeviceId(deviceId string) *Network {
 	n.DeviceId = deviceId
+	return n
+}
+
+func (n *Network) SetMethod(method enums.HttpMethod) *Network {
+	n.Method = method
+	return n
+}
+
+func (n *Network) SetPath(path string) *Network {
+	n.Path = path
+	return n
+}
+
+func (n *Network) SetStatusCode(statusCode uint) *Network {
+	n.StatusCode = statusCode
 	return n
 }
 

@@ -1,6 +1,10 @@
 mode:
   dev
 
+cors:
+  enable_local: true
+  localhost: http://localhost:3000
+
 server:
   name: In App Debugger
   http:
@@ -16,3 +20,10 @@ redis:
   hosts: localhost:6379
   username: ""
   password: secret_redis
+
+mqtt:
+  name: in_app_debugger_server
+  client_id: in_app_debugger_server
+  host: localhost:9001
+  username: admin
+  password: password

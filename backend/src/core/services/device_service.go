@@ -4,6 +4,8 @@ import (
 	"backend/src/common"
 	"backend/src/common/log"
 	"backend/src/core/domains"
+	"backend/src/infra/transport/message"
+	"backend/src/infra/transport/mqtt_client"
 	"backend/src/present/http/requests"
 	"backend/src/present/http/responses"
 	"context"
@@ -30,15 +32,18 @@ func (d *DeviceService) UpdateDeviceUC(ctx context.Context, req *requests.Device
 			log.IErr(ctx, err)
 			return nil, err
 		}
-
-		return &responses.UpdateDeviceSuccess{Success: true}, nil
+	} else {
+		err := d.deviceRepo.RemoveOnlineDevice(ctx, device.DeviceId)
+		if err != nil {
+			log.IErr(ctx, err)
+			return nil, err
+		}
 	}
 
-	err := d.deviceRepo.RemoveOnlineDevice(ctx, device.DeviceId)
-	if err != nil {
-		log.IErr(ctx, err)
-		return nil, err
-	}
+	go func() {
+		deviceMsg := message.NewDeviceMsg(device)
+		mqtt_client.GlobalClient.Publish(deviceMsg.Topic(), deviceMsg.Payload())
+	}()
 
 	return &responses.UpdateDeviceSuccess{Success: true}, nil
 }

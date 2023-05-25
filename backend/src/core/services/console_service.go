@@ -4,6 +4,8 @@ import (
 	"backend/src/common"
 	"backend/src/common/log"
 	"backend/src/core/domains"
+	"backend/src/infra/transport/message"
+	"backend/src/infra/transport/mqtt_client"
 	"backend/src/present/http/requests"
 	"context"
 )
@@ -38,6 +40,11 @@ func (c *ConsoleService) CreateConsoleUC(ctx context.Context, req *requests.Cons
 		log.IErr(ctx, err)
 		return nil, err
 	}
+
+	go func() {
+		consoleMsg := message.NewConsoleMsg(console)
+		mqtt_client.GlobalClient.Publish(consoleMsg.Topic(), consoleMsg.Payload())
+	}()
 
 	return console, nil
 }

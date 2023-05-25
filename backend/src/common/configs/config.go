@@ -7,6 +7,11 @@ import (
 type Config struct {
 	Mode string `mapstructure:"mode"`
 
+	Cors struct {
+		EnableLocal bool   `mapstructure:"enable_local"`
+		Localhost   string `mapstructure:"localhost"`
+	} `mapstructure:"cors"`
+
 	Server struct {
 		Name string `mapstructure:"name"`
 		Http struct {
@@ -25,6 +30,14 @@ type Config struct {
 		Username string   `mapstructure:"username"`
 		Password string   `mapstructure:"password"`
 	} `mapstructure:"redis"`
+
+	MQTT struct {
+		Name     string `mapstructure:"name"`
+		ClientId string `mapstructure:"client_id"`
+		Host     string `mapstructure:"host"`
+		Username string `mapstructure:"username"`
+		Password string `mapstructure:"password"`
+	} `mapstructure:"mqtt"`
 }
 
 var common *Config

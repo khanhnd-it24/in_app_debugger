@@ -6,8 +6,8 @@ import (
 )
 
 type Device struct {
-	DeviceId   string `bson:"device_id"`
-	DeviceName string `bson:"device_name"`
+	DeviceId   string `bson:"device_id" json:"deviceId"`
+	DeviceName string `bson:"device_name" json:"deviceName"`
 }
 
 func NewDevice(deviceId string, deviceName string) *Device {

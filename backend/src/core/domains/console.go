@@ -8,11 +8,11 @@ import (
 )
 
 type Console struct {
-	Id        primitive.ObjectID `bson:"_id,omitempty"`
-	DeviceId  string             `bson:"device_id"`
-	Content   string             `bson:"content"`
-	CreatedAt time.Time          `bson:"created_at"`
-	UpdatedAt time.Time          `bson:"updated_at"`
+	Id        primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	DeviceId  string             `bson:"device_id" json:"deviceId"`
+	Content   string             `bson:"content" json:"content"`
+	CreatedAt time.Time          `bson:"created_at" json:"createdAt"`
+	UpdatedAt time.Time          `bson:"updated_at" json:"updatedAt"`
 }
 
 func NewConsole() *Console {

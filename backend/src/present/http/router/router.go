@@ -30,6 +30,10 @@ func RegisterHandler(engine *gin.Engine) {
 func RegisterGinRouters(in RoutersIn) {
 	in.Engine.Use(cors.AllowAll())
 
+	if configs.Get().Cors.EnableLocal {
+		in.Engine.Use(middlewares.CORSMiddleware())
+	}
+
 	group := in.Engine.Group(configs.Get().Server.Http.Prefix)
 	group.GET("/ping", middlewares.HealthCheckEndpoint)
 	// http swagger serve
@@ -41,19 +45,19 @@ func registerPublicRouters(r *gin.RouterGroup, in RoutersIn) {
 	deviceGroup := r.Group("/devices")
 	{
 		deviceGroup.GET("/:device_id", in.DeviceController.GetDevice)
-		deviceGroup.GET("/", in.DeviceController.GetAllDevices)
-		deviceGroup.PUT("/", in.DeviceController.UpdateDevice)
+		deviceGroup.GET("", in.DeviceController.GetAllDevices)
+		deviceGroup.PUT("", in.DeviceController.UpdateDevice)
 	}
 
 	networkGroup := r.Group("/networks")
 	{
 		networkGroup.GET("/:device_id", in.NetworkController.GetNetworks)
-		networkGroup.POST("/", in.NetworkController.CreateNetwork)
+		networkGroup.POST("", in.NetworkController.CreateNetwork)
 	}
 
 	consoleGroup := r.Group("/consoles")
 	{
 		consoleGroup.GET("/:device_id", in.ConsoleController.GetConsoles)
-		consoleGroup.POST("/", in.ConsoleController.CreateConsole)
+		consoleGroup.POST("", in.ConsoleController.CreateConsole)
 	}
 }

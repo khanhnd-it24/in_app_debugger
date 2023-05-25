@@ -4,6 +4,8 @@ import (
 	"backend/src/common"
 	"backend/src/common/log"
 	"backend/src/core/domains"
+	"backend/src/infra/transport/message"
+	"backend/src/infra/transport/mqtt_client"
 	"backend/src/present/http/requests"
 	"context"
 )
@@ -31,13 +33,24 @@ func (n *NetworkService) CreateNetworkUC(ctx context.Context, req *requests.Netw
 	}
 
 	network := domains.NewNetwork()
-	network.SetDeviceId(device.DeviceId).SetRequest(req.Request).SetResponse(req.Response)
+	network.
+		SetDeviceId(device.DeviceId).
+		SetRequest(req.Request).
+		SetResponse(req.Response).
+		SetStatusCode(req.StatusCode).
+		SetMethod(req.Method).
+		SetPath(req.Path)
 
 	network, err = n.networkRepo.Create(ctx, network)
 	if err != nil {
 		log.IErr(ctx, err)
 		return nil, err
 	}
+
+	go func() {
+		networkMsg := message.NewNetworkMsg(network)
+		mqtt_client.GlobalClient.Publish(networkMsg.Topic(), networkMsg.Payload())
+	}()
 
 	return network, nil
 }

@@ -59,6 +59,9 @@ func main() {
 		// build storage module
 		bootstrap.BuildStorageModules(),
 
+		//message queue
+		bootstrap.BuildMessageQueueModules(),
+
 		// build services
 		bootstrap.BuildServicesModules(),
 
