@@ -52,4 +52,17 @@ services:
         - redis
         - mongo
         - mosquitto
+      
+### Backend App #########################################
+    frontend:
+      build: ./frontend-react
+      ports:
+        - "${FRONTEND_PORT}:80"
+      
+      depends_on:
+        - backend
+
+      environment:
+        - NODE_ENV=production
+
 

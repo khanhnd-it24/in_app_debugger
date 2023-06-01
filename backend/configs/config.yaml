@@ -3,7 +3,7 @@ mode:
 
 cors:
   enable_local: true
-  localhost: http://127.0.0.1:5173
+  localhost: http://localhost:8080
 
 server:
   name: In App Debugger
