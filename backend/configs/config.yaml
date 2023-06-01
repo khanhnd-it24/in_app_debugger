@@ -3,7 +3,7 @@ mode:
 
 cors:
   enable_local: true
-  localhost: http://localhost:3000
+  localhost: http://127.0.0.1:5173
 
 server:
   name: In App Debugger
@@ -24,6 +24,7 @@ redis:
 mqtt:
   name: in_app_debugger_server
   client_id: in_app_debugger_server
-  host: localhost:9001
+  protocol: ws
+  host: localhost:9001/mqtt
   username: admin
   password: password

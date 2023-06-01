@@ -41,7 +41,7 @@ func (d *DeviceService) UpdateDeviceUC(ctx context.Context, req *requests.Device
 	}
 
 	go func() {
-		deviceMsg := message.NewDeviceMsg(device)
+		deviceMsg := message.NewDeviceMsg(device, req.IsOnline)
 		mqtt_client.GlobalClient.Publish(deviceMsg.Topic(), deviceMsg.Payload())
 	}()
 

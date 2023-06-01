@@ -6,8 +6,9 @@ import (
 )
 
 type DeviceMsg struct {
-	DeviceId   string `bson:"device_id" json:"deviceId"`
-	DeviceName string `bson:"device_name" json:"deviceName"`
+	DeviceId   string `json:"deviceId"`
+	DeviceName string `json:"deviceName"`
+	IsOnline   bool   `json:"isOnline"`
 }
 
 func (i *DeviceMsg) Topic() string {
@@ -22,9 +23,10 @@ func (i *DeviceMsg) Payload() string {
 	return string(val)
 }
 
-func NewDeviceMsg(device *domains.Device) *DeviceMsg {
+func NewDeviceMsg(device *domains.Device, isOnline bool) *DeviceMsg {
 	return &DeviceMsg{
 		DeviceId:   device.DeviceId,
 		DeviceName: device.DeviceName,
+		IsOnline:   isOnline,
 	}
 }

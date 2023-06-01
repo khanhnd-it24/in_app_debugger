@@ -13,8 +13,10 @@ type MqttClient struct {
 
 func NewMqttClient() *MqttClient {
 	config := configs.Get()
+	broker := fmt.Sprintf("%s://%s", config.MQTT.Protocol, config.MQTT.Host)
+	fmt.Printf("Connecting to MQTT broker %s\n", broker)
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("tcp://%s", config.MQTT.Host))
+	opts.AddBroker(broker)
 	opts.SetClientID(config.MQTT.ClientId)
 	opts.SetUsername(config.MQTT.Username)
 	opts.SetPassword(config.MQTT.Password)
@@ -39,11 +41,11 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 }
 
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
-	fmt.Printf("Connected to mqtt broker")
+	fmt.Println("Connected to mqtt broker")
 }
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-	fmt.Printf("Disconnected from mqtt broker")
+	fmt.Println("Disconnected from mqtt broker")
 }
 
 func (m *MqttClient) Disconnect() {

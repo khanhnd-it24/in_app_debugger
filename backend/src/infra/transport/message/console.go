@@ -9,11 +9,11 @@ import (
 )
 
 type ConsoleMsg struct {
-	Id        primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	DeviceId  string             `bson:"device_id" json:"deviceId"`
-	Content   string             `bson:"content" json:"content"`
-	CreatedAt time.Time          `bson:"created_at" json:"createdAt"`
-	UpdatedAt time.Time          `bson:"updated_at" json:"updatedAt"`
+	Id        primitive.ObjectID `json:"_id"`
+	DeviceId  string             `json:"deviceId"`
+	Content   string             `json:"content"`
+	CreatedAt time.Time          `json:"createdAt"`
+	UpdatedAt time.Time          `json:"updatedAt"`
 }
 
 func (i *ConsoleMsg) Topic() string {

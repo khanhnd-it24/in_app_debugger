@@ -11,7 +11,7 @@ import (
 
 func NewConsoleRepo(db *mongo.Database) domains.ConsoleRepo {
 	return &ConsoleRepo{
-		collection: db.Collection(new(domains.Network).CollectionName()),
+		collection: db.Collection(new(domains.Console).CollectionName()),
 	}
 }
 

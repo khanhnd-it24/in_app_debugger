@@ -34,6 +34,7 @@ type Config struct {
 	MQTT struct {
 		Name     string `mapstructure:"name"`
 		ClientId string `mapstructure:"client_id"`
+		Protocol string `mapstructure:"protocol"`
 		Host     string `mapstructure:"host"`
 		Username string `mapstructure:"username"`
 		Password string `mapstructure:"password"`

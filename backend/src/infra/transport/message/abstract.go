@@ -3,7 +3,7 @@ package message
 const (
 	MqttDevices = "devices"
 	MqttNetwork = "networks/%s"
-	MqttConsole = "console/%s"
+	MqttConsole = "consoles/%s"
 )
 
 type AbstractMqtt interface {
